@@ -1,0 +1,29 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="shield" x1="82" y1="42" x2="429" y2="472" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#173B68"/>
+      <stop offset="1" stop-color="#07192E"/>
+    </linearGradient>
+    <linearGradient id="scan" x1="146" y1="179" x2="369" y2="345" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#54C7FF"/>
+      <stop offset="1" stop-color="#2F7CF6"/>
+    </linearGradient>
+    <filter id="shadow" x="30" y="20" width="452" height="482" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="14" stdDeviation="14" flood-color="#061426" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <g filter="url(#shadow)">
+    <path d="M256 36L427 96V226C427 338 358 434 256 477C154 434 85 338 85 226V96L256 36Z" fill="url(#shield)"/>
+    <path d="M256 56L407 109V226C407 326 348 410 256 454C164 410 105 326 105 226V109L256 56Z" stroke="#7BD8FF" stroke-opacity="0.65" stroke-width="5"/>
+  </g>
+  <path d="M169 274L187 224C192 210 205 201 220 201H292C307 201 320 210 325 224L343 274" stroke="white" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M157 276H355C367 276 376 285 376 297V333C376 345 367 354 355 354H157C145 354 136 345 136 333V297C136 285 145 276 157 276Z" fill="#F7FAFF"/>
+  <path d="M181 354V371M331 354V371" stroke="white" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="180" cy="314" r="14" fill="#2F7CF6"/>
+  <circle cx="332" cy="314" r="14" fill="#2F7CF6"/>
+  <path d="M211 313H301" stroke="#173B68" stroke-width="9" stroke-linecap="round"/>
+  <path d="M135 185V151C135 141 143 133 153 133H187M377 185V151C377 141 369 133 359 133H325M135 363V391C135 401 143 409 153 409H187M377 363V391C377 401 369 409 359 409H325" stroke="url(#scan)" stroke-width="12" stroke-linecap="round"/>
+  <rect x="224" y="155" width="31" height="13" rx="6.5" fill="#2F7CF6"/>
+  <rect x="257" y="155" width="31" height="13" rx="6.5" fill="#F04455"/>
+</svg>
+
