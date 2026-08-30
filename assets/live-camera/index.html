@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Gaadi Inspector camera</title>
+  </head>
+  <body>
+    <main id="camera-shell">
+      <video id="camera" autoplay muted playsinline></video>
+      <div class="scan-line" aria-hidden="true"></div>
+      <div class="camera-badge"><span></span> LIVE SCAN</div>
+      <button id="flip" type="button" aria-label="Switch front or rear camera">↻ <span>Flip</span></button>
+      <div id="message">Starting camera…</div>
+      <canvas id="capture" hidden></canvas>
+    </main>
+    <script src="./main.js"></script>
+  </body>
+</html>

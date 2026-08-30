@@ -2,11 +2,9 @@ from __future__ import annotations
 
 import io
 
-import numpy as np
 from PIL import Image, ImageDraw
 
 from src.image_quality import assess_image_quality
-from src.live_service import draw_live_detections
 from src.model_service import Detection, annotate_image
 from src.report_service import build_pdf_report, report_payload
 
@@ -62,19 +60,3 @@ def test_pdf_generation():
     pdf = build_pdf_report(inspection, quality.to_dict(), [detection], image, annotated)
     assert pdf.startswith(b"%PDF")
     assert len(pdf) > 10_000
-
-
-def test_live_overlay():
-    frame = np.zeros((720, 1280, 3), dtype=np.uint8)
-    result = draw_live_detections(
-        frame,
-        [
-            {
-                "damage_type": "scratch",
-                "confidence": 0.72,
-                "bbox": [220, 180, 620, 410],
-            }
-        ],
-    )
-    assert result.shape == frame.shape
-    assert np.any(result != frame)

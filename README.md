@@ -1,6 +1,6 @@
 # Gaadi Inspector
 
-Gaadi Inspector is a mobile-first Streamlit application for AI-assisted visible vehicle damage inspection. It accepts an uploaded photo or a still camera capture, runs the validated CarDD YOLOv8n detector, lets a person review each finding, and exports a professional PDF, annotated image and JSON record. An optional Live Inspection - Beta mode overlays provisional detections on a WebRTC camera feed for product testing.
+Gaadi Inspector is a mobile-first Streamlit application for AI-assisted visible vehicle damage inspection. It accepts an uploaded photo or a still camera capture, runs the validated CarDD YOLOv8n detector, lets a person review each finding, and exports a professional PDF, annotated image and JSON record. An optional Live Inspection - Beta mode automatically analyses periodic camera frames for product testing without WebRTC, STUN or TURN configuration.
 
 ## Product scope
 
@@ -71,7 +71,8 @@ pytest -q
 - Connect the GitHub repository in Streamlit Community Cloud and select `app.py` as the entrypoint.
 - Choose Python 3.12 in Advanced settings so local and hosted environments can match.
 - Community Cloud serves the app over HTTPS, which is required for remote camera access.
-- Live Inspection uses a free public STUN server. Some restricted mobile or workplace networks may require a TURN server; the still-photo modes remain available if WebRTC cannot connect.
+- Live Inspection uses automatic browser camera snapshots over Streamlit's normal app connection. It does not require STUN or TURN configuration.
+- Live Inspection requests the rear camera first on supported phones and includes a compact Flip control.
 - Keep the model and source licences documented.
 - Use private or approved model storage when weights cannot be redistributed.
 - Vehicle images sent to a remotely hosted Streamlit app are processed on that host.
@@ -93,7 +94,7 @@ gaadi-inspector/
 ├── src/
 │   ├── brand.py
 │   ├── image_quality.py
-│   ├── live_service.py
+│   ├── live_camera.py
 │   ├── model_service.py
 │   └── report_service.py
 ├── tests/test_core.py

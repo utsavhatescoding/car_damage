@@ -9,7 +9,7 @@ from PIL import Image
 
 from src.brand import ASSETS, app_css, load_svg
 from src.image_quality import assess_image_quality, normalize_orientation
-from src.live_service import create_live_callback
+from src.live_camera import live_camera
 from src.model_service import CLASS_NAMES, Detection, annotate_image, load_model, resolve_model_path, run_inference
 from src.report_service import build_json_report, build_pdf_report, report_payload
 
@@ -141,69 +141,53 @@ with camera_tab:
 
 with live_tab:
     st.markdown(
-        '<div class="gi-alert gi-alert-warning">⚠️ <div><strong>Testing mode.</strong> Live boxes are provisional and are not included in an inspection report. Use Upload photo or Use camera for report-grade analysis.</div></div>',
+        '<div class="gi-alert gi-alert-warning">⚠️ <div><strong>Live testing mode.</strong> Allow camera access, then point the camera at one vehicle area. Boxes are provisional and are not included in an inspection report.</div></div>',
         unsafe_allow_html=True,
     )
-    live_controls = st.columns(2)
-    live_confidence = live_controls[0].slider(
-        "Live confidence",
-        min_value=0.15,
-        max_value=0.90,
-        value=0.35,
-        step=0.05,
-        key="live_confidence",
-        help="Lower values display more possible damage and more false alerts.",
-    )
-    live_stride = live_controls[1].select_slider(
-        "Analyse every",
-        options=[1, 2, 3, 4, 5],
-        value=3,
-        format_func=lambda value: f"{value} frame" if value == 1 else f"{value} frames",
-        help="A larger interval reduces server work during testing.",
-    )
-
     model_path = resolve_model_path()
     if not model_path.exists():
         st.error("Install the validated model weights before starting live inspection.")
     else:
         try:
-            from streamlit_webrtc import WebRtcMode, webrtc_streamer
+            live_frame = live_camera(interval_ms=1200, key="gaadi-live-camera")
 
-            webrtc_streamer(
-                key="gaadi-live-inspection",
-                mode=WebRtcMode.SENDRECV,
-                video_frame_callback=create_live_callback(
-                    cached_model(),
-                    confidence=live_confidence,
-                    frame_stride=live_stride,
-                ),
-                rtc_configuration={
-                    "iceServers": [
-                        {"urls": ["stun:stun.l.google.com:19302"]}
-                    ]
-                },
-                media_stream_constraints={
-                    "video": {
-                        "facingMode": {"ideal": "environment"},
-                        "width": {"ideal": 1280},
-                        "height": {"ideal": 720},
-                    },
-                    "audio": False,
-                },
-                video_html_attrs={
-                    "autoPlay": True,
-                    "controls": False,
-                    "muted": True,
-                    "playsInline": True,
-                },
-                media_toggle_controls=False,
-            )
-            st.caption(
-                "Point the rear camera at one vehicle area and move slowly. "
-                "For small damage, stop movement and move closer."
-            )
-        except ImportError:
-            st.error("Live inspection dependencies are missing. Run: pip install -r requirements.txt")
+            if live_frame is None:
+                st.markdown(
+                    '<div class="gi-alert gi-alert-info">📷 <div><strong>Waiting for camera…</strong><br/>Allow camera permission when your browser asks. The first analysed frame will appear automatically.</div></div>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                frame_image = normalize_orientation(Image.open(live_frame))
+                with st.spinner("Scanning live frame…"):
+                    live_detections, live_inference_ms = run_inference(
+                        cached_model(),
+                        frame_image,
+                        confidence=0.25,
+                    )
+                live_annotated = annotate_image(frame_image, live_detections)
+                st.image(
+                    live_annotated,
+                    caption="Live provisional inspection",
+                    use_container_width=True,
+                )
+                if live_detections:
+                    names = ", ".join(
+                        f"{item.damage_type.title()} {item.confidence:.0%}"
+                        for item in live_detections
+                    )
+                    st.markdown(
+                        f'<div class="gi-alert gi-alert-warning">● <div><strong>Possible damage:</strong> {names}<br/><span class="gi-small">Live frame analysed in {live_inference_ms:.0f} ms. Capture a still photo to create a report.</span></div></div>',
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    st.markdown(
+                        '<div class="gi-alert gi-alert-success">✓ <div>No supported damage detected in this frame. Move slowly and scan another area.</div></div>',
+                        unsafe_allow_html=True,
+                    )
+            st.caption("Move slowly and hold still for one second near possible damage. The rear camera is requested automatically; tap Flip when needed.")
+        except Exception as error:
+            st.error("The live camera could not start. Allow camera access, reload the page and try again.")
+            st.caption(f"Technical detail: {type(error).__name__}")
 
 source_file = camera_file or uploaded_file
 source_name = "Camera capture" if camera_file else "Uploaded photo"
